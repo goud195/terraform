@@ -6,5 +6,5 @@ terraform/
 ├── uat.tfvars        # env = "uat"
 └── module/
     └── lambda/
-        ├── main.tf       # IAM + Lambda creation here
+        ├── main.tf       # IAM + Lambda creation here 
         └── variables.tf  # policy lists + environment variable   
