@@ -1,1 +1,53 @@
-abc 
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENV', choices: ['dev', 'test', 'uat'], description: 'Select Environment')
+        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Terraform Action')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir("envs/${ENV}") {
+                    sh 'terraform init'
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                dir("envs/${ENV}") {
+                    sh 'terraform plan -var-file=terraform.tfvars'
+                }
+            }
+        }
+
+        // 🔐 Manual approval only for UAT
+        stage('Approve UAT') {
+            when {
+                expression { params.ENV == 'uat' }
+            }
+            steps {
+                script {
+                    input message: "Approve ${ACTION} for UAT environment?", ok: "Proceed"
+                }
+            }
+        }
+
+        stage('Terraform Apply/Destroy') {
+            steps {
+                dir("envs/${ENV}") {
+                    sh "terraform ${ACTION} -auto-approve -var-file=terraform.tfvars"
+                }
+            }
+        }
+    }
+}
