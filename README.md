@@ -7,4 +7,6 @@ terraform/
 └── module/
     └── lambda/
         ├── main.tf       # IAM + Lambda creation here 
-        └── variables.tf  # policy lists + environment variable   
+        └── variables.tf  # policy lists + environment variable  
+
+
