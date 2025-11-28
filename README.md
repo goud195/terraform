@@ -33,7 +33,9 @@ https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/
     9  aws --version
    10  history
 
-set creds >>>>> u name + pswd and in ID cet as aws-cdres-dev(same as j-file)
+############ set the creds in jenkins #############
+
+set the creds >>>>> u name + pswd && in ID seet as aws_cdres_dev(same as j-file)
 ![alt text](image.png)
 
 
