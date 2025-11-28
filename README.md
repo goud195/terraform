@@ -21,4 +21,19 @@ https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/
     7  sudo apt-get install -y terraform
     8  terraform -version
 
+#############  install  aws cli on jenkins  to auth #########
+    1  sudo apt-get update -y
+    2  sudo apt-get install -y awscli
+    3  sudo apt-get update -y
+    4  sudo apt-get install -y awscli
+    5  sudo apt-get install -y unzip
+    6  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    7  unzip awscliv2.zip
+    8  sudo ./aws/install
+    9  aws --version
+   10  history
+
+set creds >>>>> u name + pswd and in ID cet as aws-cdres-dev(same as j-file)
+![alt text](image.png)
+
 
