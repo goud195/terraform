@@ -1,16 +1,12 @@
-data aws_caller_identity current {
-}
+data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
 #################### account id and region  ##########################
 locals {
- account_id          = data.aws_caller_identity.current.account_id
- aws_region = data.aws_region.current.name
+  account_id = data.aws_caller_identity.current.account_id
+  aws_region = data.aws_region.current.id   # was .name (deprecated)
 }
-
-#########################################################
-
 
 locals {
   env = var.environment
@@ -33,7 +29,6 @@ resource "aws_iam_role" "user_role" {
   })
 }
 
-# Attach each managed policy in user_policy list
 resource "aws_iam_role_policy_attachment" "user_managed_policies" {
   for_each   = toset(var.user_policy)
   role       = aws_iam_role.user_role.name
@@ -46,7 +41,10 @@ resource "aws_lambda_function" "user_lambda" {
   runtime       = var.runtime
   handler       = var.handler
 
-  filename         = "lambda_dummy.zip"
+  #  path.module so it looks in modules/lambda
+  filename         = "${path.module}/lambda_dummy.zip"
+  # (optional but good)
+  # source_code_hash = filebase64sha256("${path.module}/lambda_dummy.zip")
 
   timeout     = 10
   memory_size = 128
@@ -69,7 +67,6 @@ resource "aws_iam_role" "payment_role" {
   })
 }
 
-# Attach each managed policy in payment_aws_policy_arn list
 resource "aws_iam_role_policy_attachment" "payment_managed_policies" {
   for_each   = toset(var.payment_aws_policy_arn)
   role       = aws_iam_role.payment_role.name
@@ -82,7 +79,9 @@ resource "aws_lambda_function" "payment_lambda" {
   runtime       = var.runtime
   handler       = var.handler
 
-  filename         = "lambda_dummy.zip"
+
+  filename         = "${path.module}/lambda_dummy.zip"
+  # source_code_hash = filebase64sha256("${path.module}/lambda_dummy.zip")
 
   timeout     = 10
   memory_size = 128
