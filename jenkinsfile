@@ -3,7 +3,7 @@ pipeline {
 
     parameters {
         choice(name: 'ENV', choices: ['dev', 'test', 'uat'], description: 'Select Environment')
-        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Terraform Action')
+        choice(name: 'ACTION', choices: ['plan', 'apply', 'destroy'], description: 'Terraform Action')
     }
 
     stages {
@@ -16,37 +16,41 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                dir("envs/${ENV}") {
-                    sh 'terraform init'
-                }
+                // run in repo root where main.tf lives
+                sh 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                dir("envs/${ENV}") {
-                    sh 'terraform plan -var-file=terraform.tfvars'
+                script {
+                    if (params.ACTION == 'destroy') {
+                        sh "terraform plan -destroy -var-file=${params.ENV}.tfvars"
+                    } else {
+                        sh "terraform plan -var-file=${params.ENV}.tfvars"
+                    }
                 }
             }
         }
 
-        // 🔐 Manual approval only for UAT
+        // 🔐 Manual approval only for UAT apply
         stage('Approve UAT') {
             when {
-                expression { params.ENV == 'uat' }
+                expression { params.ENV == 'uat' && params.ACTION == 'apply' }
             }
             steps {
                 script {
-                    input message: "Approve ${ACTION} for UAT environment?", ok: "Proceed"
+                    input message: "Approve ${params.ACTION} for UAT environment?", ok: "Proceed"
                 }
             }
         }
 
         stage('Terraform Apply/Destroy') {
+            when {
+                expression { params.ACTION != 'plan' }
+            }
             steps {
-                dir("envs/${ENV}") {
-                    sh "terraform ${ACTION} -auto-approve -var-file=terraform.tfvars"
-                }
+                sh "terraform ${params.ACTION} -auto-approve -var-file=${params.ENV}.tfvars"
             }
         }
     }
