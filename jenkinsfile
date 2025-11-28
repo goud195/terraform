@@ -6,6 +6,10 @@ pipeline {
         choice(name: 'ACTION', choices: ['plan', 'apply', 'destroy'], description: 'Terraform Action')
     }
 
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -14,10 +18,30 @@ pipeline {
             }
         }
 
-        stage('Terraform Init') {
+        stage('Set AWS Credentials') {
             steps {
-                // run in repo root where main.tf lives
-                sh 'terraform init'
+                script {
+                    def credsId = ""
+
+                    if (params.ENV == "dev") {
+                        credsId = "aws-creds-dev"
+                    } else if (params.ENV == "test") {
+                        credsId = "aws-creds-test"
+                    } else if (params.ENV == "uat") {
+                        credsId = "aws-creds-uat"
+                    }
+
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: credsId,
+                            usernameVariable: 'AWS_ACCESS_KEY_ID',
+                            passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                        )
+                    ]) {
+                        sh 'aws sts get-caller-identity'
+                        sh 'terraform init'
+                    }
+                }
             }
         }
 
@@ -33,15 +57,12 @@ pipeline {
             }
         }
 
-        // 🔐 Manual approval only for UAT apply
         stage('Approve UAT') {
             when {
                 expression { params.ENV == 'uat' && params.ACTION == 'apply' }
             }
             steps {
-                script {
-                    input message: "Approve ${params.ACTION} for UAT environment?", ok: "Proceed"
-                }
+                input message: "Approve ${params.ACTION} for UAT?", ok: "Proceed"
             }
         }
 
