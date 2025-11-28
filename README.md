@@ -39,3 +39,9 @@ set the creds >>>>> u name + pswd && in ID set as aws_cdres_dev(same as j-file)
 ![alt text](image.png)
 
 
+####### t set previos dtae files into tf state in initial stage ######  run with jenkins user ####
+ terraform init \
+  -backend-config="bucket=gg-tf-state-tf-dev" \
+  -backend-config="key=lambda/dev/terraform.tfstate" \
+  -backend-config="region=us-east-1" \
+  -backend-config="dynamodb_table=terraform-locks-dev"
