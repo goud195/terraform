@@ -45,3 +45,5 @@ set the creds >>>>> u name + pswd && in ID set as aws_cdres_dev(same as j-file)
   -backend-config="key=lambda/dev/terraform.tfstate" \
   -backend-config="region=us-east-1" \
   -backend-config="dynamodb_table=terraform-locks-dev"
+
+  git add .; git commit -m "Fix module path and Jenkinsfile"; git push
