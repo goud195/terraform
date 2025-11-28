@@ -1,4 +1,3 @@
-abc
 variable "environment" {
   type = string
 }
@@ -23,7 +22,7 @@ variable "user_policy" {
   ]
 }
 
-# (optional) runtime/handler if you want to override from root in future
+# Optional – override from root if needed in future
 variable "runtime" {
   type    = string
   default = "python3.9"
