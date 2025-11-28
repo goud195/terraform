@@ -38,7 +38,7 @@ pipeline {
                             passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                         )
                     ]) {
-                        // Just to verify which AWS account we're using
+                        // Verify which AWS account we are using
                         sh 'aws sts get-caller-identity'
 
                         // Init Terraform with remote S3 backend + DynamoDB locking, per ENV
@@ -46,7 +46,6 @@ pipeline {
                             terraform init \
                               -input=false \
                               -migrate-state \
-                              -reconfigure \
                               -backend-config="bucket=gg-tf-state-tf-${params.ENV}" \
                               -backend-config="key=lambda/${params.ENV}/terraform.tfstate" \
                               -backend-config="region=us-east-1" \
