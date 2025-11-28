@@ -86,3 +86,4 @@ resource "aws_lambda_function" "payment_lambda" {
   timeout     = 10
   memory_size = 128
 }
+   
