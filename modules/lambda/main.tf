@@ -46,8 +46,7 @@ resource "aws_lambda_function" "user_lambda" {
   runtime       = var.runtime
   handler       = var.handler
 
-  filename         = "user-lambda-${local.env}.zip"
-  source_code_hash = filebase64sha256("user-lambda-${local.env}.zip")
+  filename         = "lambda-dummy.zip"
 
   timeout     = 10
   memory_size = 128
@@ -83,8 +82,7 @@ resource "aws_lambda_function" "payment_lambda" {
   runtime       = var.runtime
   handler       = var.handler
 
-  filename         = "payment-lambda-${local.env}.zip"
-  source_code_hash = filebase64sha256("payment-lambda-${local.env}.zip")
+  filename         = "lambda-dummy.zip"
 
   timeout     = 10
   memory_size = 128
