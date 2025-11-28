@@ -39,7 +39,13 @@ pipeline {
                         )
                     ]) {
                         sh 'aws sts get-caller-identity'
-                        sh 'terraform init'
+                        sh """
+                            terraform init -reconfigure \
+                              -backend-config="bucket=gg-tf-state-tf-${params.ENV}" \
+                              -backend-config="key=lambda/${params.ENV}/terraform.tfstate" \
+                              -backend-config="region=us-east-1" \
+                              -backend-config="dynamodb_table=terraform-locks-${params.ENV}"
+                        """
                     }
                 }
             }
