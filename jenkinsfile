@@ -45,7 +45,7 @@ pipeline {
                         sh """
                             terraform init \
                               -input=false \
-                              -migrate-state \
+                              -reconfigure \
                               -backend-config="bucket=gg-tf-state-tf-${params.ENV}" \
                               -backend-config="key=lambda/${params.ENV}/terraform.tfstate" \
                               -backend-config="region=us-east-1" \
