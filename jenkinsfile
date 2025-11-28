@@ -38,21 +38,26 @@ pipeline {
                             passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                         )
                     ]) {
-                        // Verify which AWS account we are using
-                        sh 'aws sts get-caller-identity'
+                        env.AWS_ACCESS_KEY_ID      = AWS_ACCESS_KEY_ID
+                        env.AWS_SECRET_ACCESS_KEY = AWS_SECRET_ACCESS_KEY
 
-                        // Init Terraform with remote S3 backend + DynamoDB locking, per ENV
-                        sh """
-                            terraform init \
-                              -input=false \
-                              -reconfigure \
-                              -backend-config="bucket=gg-tf-state-tf-${params.ENV}" \
-                              -backend-config="key=lambda/${params.ENV}/terraform.tfstate" \
-                              -backend-config="region=us-east-1" \
-                              -backend-config="dynamodb_table=terraform-locks-${params.ENV}"
-                        """
+                        sh 'aws sts get-caller-identity'
                     }
                 }
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh """
+                    terraform init \
+                      -input=false \
+                      -reconfigure \
+                      -backend-config="bucket=gg-tf-state-tf-${params.ENV}" \
+                      -backend-config="key=lambda/${params.ENV}/terraform.tfstate" \
+                      -backend-config="region=us-east-1" \
+                      -backend-config="dynamodb_table=terraform-locks-${params.ENV}"
+                """
             }
         }
 
